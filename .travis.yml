@@ -1,0 +1,15 @@
+## Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
+
+language: haskell
+
+ghc:
+  - 7.4
+  - 7.6
+
+install:
+  - cabal install --only-dependencies --enable-tests
+  - cabal install hlint
+  - export PATH=$HOME/.cabal/bin:$PATH
+
+before_script:
+  - hlint .
