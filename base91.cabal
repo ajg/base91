@@ -1,0 +1,26 @@
+Name:                  base91
+Version:               0.1.0
+Author:                Alvaro J. Genial
+Maintainer:            ajg
+Homepage:              https://github.com/ajg/base91
+Synopsis:              A Base91 encoder & decoder
+Description:           An implementation of Base91 encoding & decoding of bytes to/from strings.
+License:               MIT
+License-File:          LICENSE.md
+Category:              Codec
+Build-type:            Simple
+Cabal-version:         >= 1.8
+
+Library
+  Exposed-modules:     Codec.Binary.Base91.String
+  Build-depends:       base >= 4 && < 5
+
+Test-suite tests
+  Hs-Source-Dirs:       .
+  Main-Is:              Test.hs
+  Type:                 exitcode-stdio-1.0
+  Build-Depends:        base, base91, QuickCheck
+
+source-repository head
+  type:                git
+  location:            https://github.com/ajg/base91/tree/master
