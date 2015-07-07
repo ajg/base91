@@ -27,7 +27,7 @@ encode = g . foldl' f (0, 0, []) where
       in (q, n, cs ++ trail)
 
   g :: (Int, Int, [Char]) -> [Char]
-  g (queue, 0,     cs) = cs
+  g (_,     0,     cs) = cs
   g (queue, nbits, cs) = cs ++ [y] ++ z
     where y = encoding !! (queue `mod` 91)
           z | nbits > 7 || queue > 90 = [encoding !! (queue `div` 91)]
@@ -51,7 +51,7 @@ decode = g . foldl' f (0, 0, -1, []) where
              in (queue', nbits', -1, ws ++ map fromIntegral trail)
 
   g :: (Int, Int, Int, [Word8]) -> [Word8]
-  g (queue, nbits, -1,  ws) = ws
+  g (_,     _,     -1,  ws) = ws
   g (queue, nbits, val, ws) = ws ++ [fromIntegral $ queue .|. (val `shiftL` nbits)]
 
 
