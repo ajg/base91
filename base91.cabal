@@ -17,9 +17,9 @@ Library
 
 Test-suite tests
   Hs-Source-Dirs:       .
-  Main-Is:              Test-String.hs
+  Main-Is:              Test.hs
   Type:                 exitcode-stdio-1.0
-  Build-Depends:        base, base91, QuickCheck
+  Build-Depends:        base, base91, bytestring, text, QuickCheck
 
 source-repository head
   type:                git
