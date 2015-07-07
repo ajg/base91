@@ -1,7 +1,7 @@
 -- Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
 
-import Test.QuickCheck (quickCheck)
 import Codec.Binary.Base91.String (decode, encode)
+import Test.QuickCheck
 
 main :: IO ()
 main = do

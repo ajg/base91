@@ -17,7 +17,7 @@ Library
 
 Test-suite tests
   Hs-Source-Dirs:       .
-  Main-Is:              Test.hs
+  Main-Is:              Test-String.hs
   Type:                 exitcode-stdio-1.0
   Build-Depends:        base, base91, QuickCheck
 
