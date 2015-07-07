@@ -19,7 +19,9 @@ The library is not yet ready for production; it is documented using `haddock` an
 Dependencies
 ------------
 
-The only requirement is the `base` package; testing requires on the `QuickCheck` package. (See [base91.cabal](./base91.cabal) for details.)
+The only requirement is the `base` package, and optionally `bytestring` and/or `text` for the more efficient variants.
+
+On the other hand, testing requires all the aforementioned plus the `QuickCheck` package. (See [base91.cabal](./base91.cabal) for details.)
 
 License
 -------
