@@ -3,6 +3,7 @@
 
 module Codec.Binary.Base91.String (decode, encode) where
 
+import qualified Codec.Binary.Base91 as B91
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
 import Data.List (foldl')
@@ -22,15 +23,15 @@ encode = g . foldl' f (0, 0, []) where
           (v, q, n)   = if val > 88
             then (val,  queue' `shiftR` 13, nbits' - 13)
             else (val', queue' `shiftR` 14, nbits' - 14)
-          trail       = [encoding !! (v `mod` 91),
-                         encoding !! (v `div` 91)]
+          trail       = [B91.encoding !! (v `mod` 91),
+                         B91.encoding !! (v `div` 91)]
       in (q, n, cs ++ trail)
 
   g :: (Int, Int, [Char]) -> [Char]
   g (_,     0,     cs) = cs
   g (queue, nbits, cs) = cs ++ [y] ++ z
-    where y = encoding !! (queue `mod` 91)
-          z | nbits > 7 || queue > 90 = [encoding !! (queue `div` 91)]
+    where y = B91.encoding !! (queue `mod` 91)
+          z | nbits > 7 || queue > 90 = [B91.encoding !! (queue `div` 91)]
             | otherwise               = []
 
 -- | Decodes octets ('[Word8]') from a 'String' in Base91; the opposite of 'encode'.
@@ -39,7 +40,7 @@ decode = g . foldl' f (0, 0, -1, []) where
 
   f :: (Int, Int, Int, [Word8]) -> Char -> (Int, Int, Int, [Word8])
   f (queue, nbits, val, ws) c =
-    let d = fromIntegral $ decoding !! ord c
+    let d = fromIntegral $ B91.decoding !! ord c
      in if d   == 91 then (queue, nbits, val, ws) else
         if val == -1 then (queue, nbits, d,   ws) else
             let v = val + (d * 91)
@@ -53,35 +54,3 @@ decode = g . foldl' f (0, 0, -1, []) where
   g :: (Int, Int, Int, [Word8]) -> [Word8]
   g (_,     _,     -1,  ws) = ws
   g (queue, nbits, val, ws) = ws ++ [fromIntegral $ queue .|. (val `shiftL` nbits)]
-
-
-encoding :: [Char]
-encoding = [
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '#', '$',
-  '%', '&', '(', ')', '*', '+', ',', '.', '/', ':', ';', '<', '=',
-  '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~', '"']
-
-decoding :: [Word8]
-decoding = [
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 62, 90, 63, 64, 65, 66, 91, 67, 68, 69, 70, 71, 91, 72, 73,
-  52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 74, 75, 76, 77, 78, 79,
-  80,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-  15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 81, 91, 82, 83, 84,
-  85, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-  41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 86, 87, 88, 89, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91]
-
-
