@@ -1,10 +1,13 @@
 Name:                  base91
-Version:               0.1.0
+Version:               0.1.1
 Author:                Alvaro J. Genial
 Maintainer:            ajg
 Homepage:              https://github.com/ajg/base91
 Synopsis:              A Base91 encoder & decoder
-Description:           An implementation of Base91 encoding & decoding of bytes to/from strings.
+Description:           An implementation of Base91 encoding & decoding of arbitrary bytes (octets)
+                       to/from characters (all in the ASCII printable range; it includes support for
+                       plain Strings, as well as optional support for ByteString and/or Text; see
+                       the Flags section for details.
 License:               MIT
 License-File:          LICENSE.md
 Category:              Codec
