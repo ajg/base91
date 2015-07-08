@@ -1,20 +1,32 @@
 -- Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
 -- Informed by Mario Rodriguez's C++ implementation.
 
-module Codec.Binary.Base91 (alphabet, decodeBy, encodeBy) where
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
+
+module Codec.Binary.Base91 (alphabet, decodeBy, encodeBy, Foldable' (..)) where
 
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
+import Data.Foldable as F
 import Data.Word (Word8)
 
 
-type LeftFold a b c = (a -> b -> a) -> a -> c -> a
+class Foldable' t where
+    type Element t :: *
+    fold' :: (b -> Element t -> b) -> b -> t -> b
+
+instance (F.Foldable t) => Foldable' (t a) where
+  type Element (t a) = a
+  fold' = F.foldl'
 
 
-encodeBy :: LeftFold (Int, Int, o) Word8 s -> (o -> [Char] -> o) -> o -> s -> o
-encodeBy fold append empty source = g . fold f (0, 0, empty) $ source where
+encodeBy :: forall i o. (Foldable' i, Element i ~ Word8) => (o -> [Char] -> o) -> o -> i -> o
+encodeBy append empty input = g . fold' f (0, 0, empty) $ input where
 
---f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
+  f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
   f (queue, nbits, output) w =
     let queue' = queue .|. (fromIntegral w `shiftL` nbits)
         nbits' = nbits + 8
@@ -28,17 +40,17 @@ encodeBy fold append empty source = g . fold f (0, 0, empty) $ source where
                          alphabet !! (v `div` 91)]
       in (q, n, append output trail)
 
---g :: (Int, Int, o) -> o
+  g :: (Int, Int, o) -> o
   g (_,     0,     output) = output
   g (queue, nbits, output) = append output (y:z)
     where y = alphabet !! (queue `mod` 91)
           z | nbits > 7 || queue > 90 = [alphabet !! (queue `div` 91)]
             | otherwise               = []
 
-decodeBy :: LeftFold (Int, Int, Int, o) Char s -> (o -> [Word8] -> o) -> o -> s -> o
-decodeBy fold append empty source = g . fold f (0, 0, -1, empty) $ source where
+decodeBy :: forall i o. (Foldable' i, Element i ~ Char) => (o -> [Word8] -> o) -> o -> i -> o
+decodeBy append empty input = g . fold' f (0, 0, -1, empty) $ input where
 
---f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
+  f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
   f (queue, nbits, val, output) c =
     let d = fromIntegral $ octets !! ord c
      in if d   == 91 then (queue, nbits, val, output) else
@@ -51,7 +63,7 @@ decodeBy fold append empty source = g . fold f (0, 0, -1, empty) $ source where
                   else (q `shiftR` 8,  n - 8,  [q])
              in (queue', nbits', -1, append output $ map fromIntegral trail)
 
---g :: (Int, Int, Int, o) -> o
+  g :: (Int, Int, Int, o) -> o
   g (_,     _,     -1,  output) = output
   g (queue, nbits, val, output) = append output [fromIntegral $ queue .|. (val `shiftL` nbits)]
 
