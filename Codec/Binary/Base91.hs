@@ -1,7 +1,7 @@
 -- Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
 -- Informed by Mario Rodriguez's C++ implementation.
 
-module Codec.Binary.Base91 (decodeBy, encodeBy) where
+module Codec.Binary.Base91 (alphabet, decodeBy, encodeBy) where
 
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
@@ -24,15 +24,15 @@ encodeBy fold append empty source = g . fold f (0, 0, empty) $ source where
           (v, q, n)   = if val > 88
             then (val,  queue' `shiftR` 13, nbits' - 13)
             else (val', queue' `shiftR` 14, nbits' - 14)
-          trail       = [encoding !! (v `mod` 91),
-                         encoding !! (v `div` 91)]
+          trail       = [alphabet !! (v `mod` 91),
+                         alphabet !! (v `div` 91)]
       in (q, n, append output trail)
 
 --g :: (Int, Int, o) -> o
   g (_,     0,     output) = output
   g (queue, nbits, output) = append output (y:z)
-    where y = encoding !! (queue `mod` 91)
-          z | nbits > 7 || queue > 90 = [encoding !! (queue `div` 91)]
+    where y = alphabet !! (queue `mod` 91)
+          z | nbits > 7 || queue > 90 = [alphabet !! (queue `div` 91)]
             | otherwise               = []
 
 decodeBy :: LeftFold (Int, Int, Int, o) Char s -> (o -> [Word8] -> o) -> o -> s -> o
@@ -40,7 +40,7 @@ decodeBy fold append empty source = g . fold f (0, 0, -1, empty) $ source where
 
 --f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
   f (queue, nbits, val, output) c =
-    let d = fromIntegral $ decoding !! ord c
+    let d = fromIntegral $ octets !! ord c
      in if d   == 91 then (queue, nbits, val, output) else
         if val == -1 then (queue, nbits, d,   output) else
             let v = val + (d * 91)
@@ -55,8 +55,8 @@ decodeBy fold append empty source = g . fold f (0, 0, -1, empty) $ source where
   g (_,     _,     -1,  output) = output
   g (queue, nbits, val, output) = append output [fromIntegral $ queue .|. (val `shiftL` nbits)]
 
-encoding :: [Char]
-encoding = [
+alphabet :: [Char]
+alphabet = [
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
   'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -65,8 +65,8 @@ encoding = [
   '%', '&', '(', ')', '*', '+', ',', '.', '/', ':', ';', '<', '=',
   '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~', '"']
 
-decoding :: [Word8]
-decoding = [
+octets :: [Word8]
+octets = [
   91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
   91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
   91, 62, 90, 63, 64, 65, 66, 91, 67, 68, 69, 70, 71, 91, 72, 73,
