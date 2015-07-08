@@ -1,4 +1,4 @@
 TODO
 ====
 
-- Factor out a generic pair of functions rather than repeat the algorithm for each variant.
+- Consider using typeclasses where possible (Monoid, Foldable, etc.)
