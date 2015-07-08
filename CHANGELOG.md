@@ -1,4 +1,9 @@
 
+0.1.2
+=====
+
+ - Fix a few documentation strings.
+
 0.1.1
 =====
 
