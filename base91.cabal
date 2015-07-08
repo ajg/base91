@@ -37,6 +37,10 @@ Library
   if flag(ByteString) && flag(Text)
     Exposed-Modules:   Codec.Binary.Base91.Efficient
 
+Executable base91
+  Main-is:             Main.hs
+  Build-Depends:       base, base91, bytestring, text
+
 Test-Suite tests
   Hs-Source-Dirs:      .
   Main-Is:             Test.hs
