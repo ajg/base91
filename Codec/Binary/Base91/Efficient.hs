@@ -6,7 +6,6 @@ module Codec.Binary.Base91.Efficient (decode, encode) where
 import qualified Codec.Binary.Base91 as B91
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
-import Data.Word (Word8)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.Text (Text)
@@ -14,28 +13,7 @@ import qualified Data.Text as T
 
 -- | Encodes octets ('ByteString') to 'Text' in Base91; the opposite of 'decode'.
 encode :: ByteString -> Text
-encode = g . BS.foldl' f (0, 0, T.empty) where
-
-  f :: (Int, Int, Text) -> Word8 -> (Int, Int, Text)
-  f (queue, nbits, t) w =
-    let queue' = queue .|. (fromIntegral w `shiftL` nbits)
-        nbits' = nbits + 8
-    in if nbits' <= 13 then (queue', nbits', t) else
-      let val  = queue' .&. 8191
-          val' = queue' .&. 16383
-          (v, q, n)   = if val > 88
-            then (val,  queue' `shiftR` 13, nbits' - 13)
-            else (val', queue' `shiftR` 14, nbits' - 14)
-          trail       = [B91.encoding !! (v `mod` 91),
-                         B91.encoding !! (v `div` 91)]
-      in (q, n, T.append t (T.pack trail))
-
-  g :: (Int, Int, Text) -> Text
-  g (_,     0,     t) = t
-  g (queue, nbits, t) = T.append t (T.pack $ [y] ++ z)
-    where y = B91.encoding !! (queue `mod` 91)
-          z | nbits > 7 || queue > 90 = [B91.encoding !! (queue `div` 91)]
-            | otherwise               = []
+encode = B91.encodeBy BS.foldl' (\t cs -> T.append t $ T.pack cs) T.empty
 
 -- | Decodes octets ('ByteString') from 'Text' in Base91; the opposite of 'encode'.
 decode :: Text -> ByteString

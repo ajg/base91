@@ -11,28 +11,7 @@ import Data.Word (Word8)
 
 -- | Encodes octets ('[Word8]') to a 'String' in Base91; the opposite of 'decode'.
 encode :: [Word8] -> String
-encode = g . foldl' f (0, 0, []) where
-
-  f :: (Int, Int, [Char]) -> Word8 -> (Int, Int, [Char])
-  f (queue, nbits, cs) w =
-    let queue' = queue .|. (fromIntegral w `shiftL` nbits)
-        nbits' = nbits + 8
-    in if nbits' <= 13 then (queue', nbits', cs) else
-      let val  = queue' .&. 8191
-          val' = queue' .&. 16383
-          (v, q, n)   = if val > 88
-            then (val,  queue' `shiftR` 13, nbits' - 13)
-            else (val', queue' `shiftR` 14, nbits' - 14)
-          trail       = [B91.encoding !! (v `mod` 91),
-                         B91.encoding !! (v `div` 91)]
-      in (q, n, cs ++ trail)
-
-  g :: (Int, Int, [Char]) -> [Char]
-  g (_,     0,     cs) = cs
-  g (queue, nbits, cs) = cs ++ [y] ++ z
-    where y = B91.encoding !! (queue `mod` 91)
-          z | nbits > 7 || queue > 90 = [B91.encoding !! (queue `div` 91)]
-            | otherwise               = []
+encode = B91.encodeBy foldl' (++) []
 
 -- | Decodes octets ('[Word8]') from a 'String' in Base91; the opposite of 'encode'.
 decode :: String -> [Word8]

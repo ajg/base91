@@ -1,9 +1,39 @@
 -- Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
 -- Informed by Mario Rodriguez's C++ implementation.
 
-module Codec.Binary.Base91 (decoding, encoding) where
+module Codec.Binary.Base91 (decoding, encodeBy) where
 
+import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Word (Word8)
+import Prelude hiding (foldl)
+
+
+type Foldl a b c = (a -> b -> a) -> a -> c -> a
+
+encodeBy :: Foldl (Int, Int, o) Word8 s -> (o -> [Char] -> o) -> o -> s -> o
+encodeBy foldl append empty source = g . foldl f (0, 0, empty) $ source where
+
+--f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
+  f (queue, nbits, output) w =
+    let queue' = queue .|. (fromIntegral w `shiftL` nbits)
+        nbits' = nbits + 8
+    in if nbits' <= 13 then (queue', nbits', output) else
+      let val  = queue' .&. 8191
+          val' = queue' .&. 16383
+          (v, q, n)   = if val > 88
+            then (val,  queue' `shiftR` 13, nbits' - 13)
+            else (val', queue' `shiftR` 14, nbits' - 14)
+          trail       = [encoding !! (v `mod` 91),
+                         encoding !! (v `div` 91)]
+      in (q, n, append output trail)
+
+--g :: (Int, Int, o) -> o
+  g (_,     0,     output) = output
+  g (queue, nbits, output) = append output (y:z)
+    where y = encoding !! (queue `mod` 91)
+          z | nbits > 7 || queue > 90 = [encoding !! (queue `div` 91)]
+            | otherwise               = []
+
 
 encoding :: [Char]
 encoding = [
