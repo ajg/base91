@@ -55,6 +55,7 @@ decodeBy fold append empty source = g . fold f (0, 0, -1, empty) $ source where
   g (_,     _,     -1,  output) = output
   g (queue, nbits, val, output) = append output [fromIntegral $ queue .|. (val `shiftL` nbits)]
 
+-- | The list of valid characters within a Base91-encoded string.
 alphabet :: [Char]
 alphabet = [
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
