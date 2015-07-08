@@ -1,17 +1,18 @@
 -- Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
 -- Informed by Mario Rodriguez's C++ implementation.
 
-module Codec.Binary.Base91 (decoding, encodeBy) where
+module Codec.Binary.Base91 (decoding, decodeBy, encodeBy) where
 
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
+import Data.Char (ord)
 import Data.Word (Word8)
-import Prelude hiding (foldl)
 
 
-type Foldl a b c = (a -> b -> a) -> a -> c -> a
+type LeftFold a b c = (a -> b -> a) -> a -> c -> a
 
-encodeBy :: Foldl (Int, Int, o) Word8 s -> (o -> [Char] -> o) -> o -> s -> o
-encodeBy foldl append empty source = g . foldl f (0, 0, empty) $ source where
+
+encodeBy :: LeftFold (Int, Int, o) Word8 s -> (o -> [Char] -> o) -> o -> s -> o
+encodeBy fold append empty source = g . fold f (0, 0, empty) $ source where
 
 --f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
   f (queue, nbits, output) w =
@@ -34,6 +35,25 @@ encodeBy foldl append empty source = g . foldl f (0, 0, empty) $ source where
           z | nbits > 7 || queue > 90 = [encoding !! (queue `div` 91)]
             | otherwise               = []
 
+decodeBy :: LeftFold (Int, Int, Int, o) Char s -> (o -> [Word8] -> o) -> o -> s -> o
+decodeBy fold append empty source = g . fold f (0, 0, -1, empty) $ source where
+
+--f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
+  f (queue, nbits, val, output) c =
+    let d = fromIntegral $ decoding !! ord c
+     in if d   == 91 then (queue, nbits, val, output) else
+        if val == -1 then (queue, nbits, d,   output) else
+            let v = val + (d * 91)
+                q = queue .|. (v `shiftL` nbits)
+                n = nbits + (if (v .&. 8191) > 88 then 13 else 14)
+                (queue', nbits', trail) = if n - 8 > 7
+                  then (q `shiftR` 16, n - 16, [q, q `shiftR` 8])
+                  else (q `shiftR` 8,  n - 8,  [q])
+             in (queue', nbits', -1, append output $ map fromIntegral trail)
+
+--g :: (Int, Int, Int, o) -> o
+  g (_,     _,     -1,  output) = output
+  g (queue, nbits, val, output) = append output $ [fromIntegral $ queue .|. (val `shiftL` nbits)]
 
 encoding :: [Char]
 encoding = [
