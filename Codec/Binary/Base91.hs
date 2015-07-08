@@ -1,7 +1,7 @@
 -- Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
 -- Informed by Mario Rodriguez's C++ implementation.
 
-module Codec.Binary.Base91 (decoding, decodeBy, encodeBy) where
+module Codec.Binary.Base91 (decodeBy, encodeBy) where
 
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
