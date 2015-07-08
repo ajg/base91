@@ -13,7 +13,7 @@ import qualified Data.Text as T
 
 -- | Encodes octets ('[Word8]') to 'Text' in Base91; the opposite of 'decode'.
 encode :: [Word8] -> Text
-encode = B91.encodeBy foldl' (\t cs -> T.append t $ T.pack cs) T.empty
+encode = B91.encodeBy foldl' (\t -> T.append t . T.pack) T.empty
 
 -- | Decodes octets ('[Word8]') from 'Text' in Base91; the opposite of 'encode'.
 decode :: Text -> [Word8]

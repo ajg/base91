@@ -13,7 +13,7 @@ import qualified Data.Text as T
 
 -- | Encodes octets ('ByteString') to 'Text' in Base91; the opposite of 'decode'.
 encode :: ByteString -> Text
-encode = B91.encodeBy BS.foldl' (\t cs -> T.append t $ T.pack cs) T.empty
+encode = B91.encodeBy BS.foldl' (\t -> T.append t . T.pack) T.empty
 
 -- | Decodes octets ('ByteString') from 'Text' in Base91; the opposite of 'encode'.
 decode :: Text -> ByteString
