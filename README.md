@@ -19,7 +19,7 @@ The codebase should be considered stable; it is [documented](#documentation) usi
 Description
 -----------
 
-Base91 is a scheme that allows arbitrary binary data (a sequence of 8-bit bytes) to be represented using an [alphabet](#alphabet) consisting of 91 of the 95 printable ASCII characters. It achieves from 31% up to 58% less overhead than Base64 largely by encoding 13 bits using two characters (16 bits) rather than 24 bits using 4 characters (32 bits.)
+Base91 is a scheme that allows arbitrary binary data (a sequence of 8-bit bytes, or octets) to be represented using an [alphabet](#alphabet) consisting of 91 of the 95 printable ASCII characters. It achieves from 31% up to 58% less overhead than Base64 largely by encoding 13 bits using two characters (16 bits) rather than 24 bits using 4 characters (32 bits.)
 
 Alphabet
 --------
