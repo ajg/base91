@@ -6,7 +6,9 @@
 
 module Codec.Binary.Base91.Control (Applicative' (..), Foldable' (..)) where
 
-import Data.Foldable (foldl')
+import Control.Applicative (Applicative, pure)
+import Data.Foldable (Foldable, foldl')
+import Data.Monoid (Monoid)
 
 -- A version of 'Applicative' compatible with monomorphic containers.
 class (Monoid a) => Applicative' a where

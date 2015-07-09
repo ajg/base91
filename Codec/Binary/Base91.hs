@@ -9,6 +9,7 @@ module Codec.Binary.Base91 (alphabet, decode, encode) where
 import Codec.Binary.Base91.Control (Applicative' (..), Foldable' (..))
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
+import Data.Monoid (mappend, mconcat, mempty)
 import Data.Word (Word8)
 
 
