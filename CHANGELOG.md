@@ -1,4 +1,9 @@
 
+1.0.1
+=====
+
+ - Expose Control module.
+
 1.0.0
 =====
 

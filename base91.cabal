@@ -1,5 +1,5 @@
 Name:                  base91
-Version:               1.0.0
+Version:               1.0.1
 Author:                Alvaro J. Genial
 Maintainer:            ajg
 Homepage:              https://github.com/ajg/base91
@@ -24,7 +24,7 @@ Flag Text
 
 Library
   Build-Depends:       base >= 4 && < 5
-  Exposed-Modules:     Codec.Binary.Base91, Codec.Binary.Base91.String
+  Exposed-Modules:     Codec.Binary.Base91, Codec.Binary.Base91.Control, Codec.Binary.Base91.String
 
   if flag(ByteString)
     Build-Depends:     bytestring
