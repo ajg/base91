@@ -10,8 +10,4 @@ ghc:
 
 install:
   - cabal install --only-dependencies --enable-tests
-  - cabal install hlint
   - export PATH=$HOME/.cabal/bin:$PATH
-
-before_script:
-  # - hlint . # TODO
