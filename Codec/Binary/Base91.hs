@@ -22,11 +22,11 @@ encode input = g . fold' f (0, 0, mempty) $ input where
     let queue' = queue .|. (fromWord8 w `shiftL` nbits)
         nbits' = nbits + 8
     in if nbits' <= 13 then (queue', nbits', output) else
-      let val  = queue' .&. 8191
-          val' = queue' .&. 16383
-          (v, q, n)   = if val > 88
-            then (val,  queue' `shiftR` 13, nbits' - 13)
-            else (val', queue' `shiftR` 14, nbits' - 14)
+      let value  = queue' .&. 8191
+          value' = queue' .&. 16383
+          (v, q, n)   = if value > 88
+            then (value,  queue' `shiftR` 13, nbits' - 13)
+            else (value', queue' `shiftR` 14, nbits' - 14)
           x = pure' $ alphabet !! (v `mod` 91)
           y = pure' $ alphabet !! (v `div` 91)
       in (q, n, mconcat [output, x, y])
@@ -43,11 +43,11 @@ decode :: forall i o. (Foldable' i, Element i ~ Char, Applicative' o, Item o ~ W
 decode input = g . fold' f (0, 0, -1, mempty) $ input where
 
   f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
-  f (queue, nbits, val, output) c =
-    let d = fromWord8 $ octets !! ord c
-     in if d   == 91 then (queue, nbits, val, output) else
-        if val == -1 then (queue, nbits, d,   output) else
-            let v = val + (d * 91)
+  f (queue, nbits, value, output) c =
+    let octet = fromWord8 $ octets !! ord c
+     in if octet == 91 then (queue, nbits, value, output) else
+        if value == -1 then (queue, nbits, octet, output) else
+            let v = value + (octet * 91)
                 q = queue .|. (v `shiftL` nbits)
                 n = nbits + (if (v .&. 8191) > 88 then 13 else 14)
                 (queue', nbits', x, y) = if n - 8 > 7
@@ -57,8 +57,8 @@ decode input = g . fold' f (0, 0, -1, mempty) $ input where
 
   g :: (Int, Int, Int, o) -> o
   g (_,     _,     -1,  output) = output
-  g (queue, nbits, val, output) = mappend output x
-    where x = pure' $ toWord8 $ queue .|. (val `shiftL` nbits)
+  g (queue, nbits, value, output) = mappend output x
+    where x = pure' $ toWord8 $ queue .|. (value `shiftL` nbits)
 
 toWord8 :: Int -> Word8
 toWord8 = fromIntegral

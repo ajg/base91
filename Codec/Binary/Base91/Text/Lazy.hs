@@ -2,29 +2,29 @@
 
 {-# LANGUAGE TypeFamilies #-}
 
-module Codec.Binary.Base91.Text (decode, encode) where
+module Codec.Binary.Base91.Text.Lazy (decode, encode) where
 
 import Codec.Binary.Base91.Control (Applicative' (..), Foldable' (..))
-import Data.Text (Text)
+import Data.Text.Lazy (Text)
 import Data.Word (Word8)
 import qualified Codec.Binary.Base91 as Base91
-import qualified Data.Text           as T
+import qualified Data.Text.Lazy      as TL
 
 
--- | Encodes ['Word8'] to 'Text' in Base91; the opposite of 'decode'.
+-- | Encodes ['Word8'] to (lazy) 'Text' in Base91; the opposite of 'decode'.
 encode :: [Word8] -> Text
 encode = Base91.encode
 
--- | Decodes ['Word8'] from 'Text' in Base91; the opposite of 'encode'.
+-- | Decodes ['Word8'] from (lazy) 'Text' in Base91; the opposite of 'encode'.
 decode :: Text -> [Word8]
 decode = Base91.decode
 
 
 instance Applicative' Text where
     type Item (Text) = Char
-    pure' = T.singleton
+    pure' = TL.singleton
 
 instance Foldable' Text where
     type Element (Text) = Char
-    fold  = T.foldl
-    fold' = T.foldl'
+    fold  = TL.foldl
+    fold' = TL.foldl'
