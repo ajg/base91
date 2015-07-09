@@ -12,7 +12,7 @@ import Data.Char (ord)
 import Data.Word (Word8)
 
 
--- | Generically encodes any sequence of 'Word8' to any sequence of 'Char' in Base91 form.
+-- | Generically encodes a 'Word8' sequence to a 'Char' sequence in Base91 form.
 encode :: forall i o. (Foldable' i, Element i ~ Word8, Applicative' o, Item o ~ Char) => i -> o
 encode input = g . fold' f (0, 0, mempty) $ input where
 
@@ -37,7 +37,7 @@ encode input = g . fold' f (0, 0, mempty) $ input where
           y | nbits > 7 || queue > 90 = pure' $ alphabet !! (queue `div` 91)
             | otherwise               = mempty
 
--- | Generically decodes any sequence of 'Word8' from any sequence of 'Char' in Base91 form.
+-- | Generically decodes a 'Word8' sequence from a 'Char' sequence in Base91 form.
 decode :: forall i o. (Foldable' i, Element i ~ Char, Applicative' o, Item o ~ Word8) => i -> o
 decode input = g . fold' f (0, 0, -1, mempty) $ input where
 
