@@ -9,6 +9,6 @@ import System.Environment (getArgs)
 
 main :: IO ()
 main = getArgs >>= \args -> case args of
-  ["encode"] -> BS.getContents >>= T.putStr . Base91.encode
+  ["encode"] -> BS.getContents >>= T.putStrLn . Base91.encode
   ["decode"] -> T.getContents >>= BS.putStr . Base91.decode
   _          -> error "invalid arguments"
