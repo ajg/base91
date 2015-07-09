@@ -32,7 +32,7 @@ Library
 
   if flag(Text)
     Build-Depends:     text
-    Exposed-Modules:   Codec.Binary.Base91.Text, Codec.Binary.Base91.Lazy
+    Exposed-Modules:   Codec.Binary.Base91.Text, Codec.Binary.Base91.Text.Lazy
 
   if flag(ByteString) && flag(Text)
     Exposed-Modules:   Codec.Binary.Base91.Efficient, Codec.Binary.Base91.Efficient.Lazy
