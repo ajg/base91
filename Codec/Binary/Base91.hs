@@ -17,14 +17,11 @@ import Data.Word (Word8)
 
 class (Monoid a) => Applicative' a where
     type Item a :: *
-    pure'    :: Item a -> a
-    -- mempty'  :: a (Item t)
-    -- mconcat' :: a (Item t)
+    pure' :: Item a -> a
 
 instance (Applicative a, Monoid (a i)) => Applicative' (a i) where
   type Item (a i) = i
   pure' = pure
-
 
 class Foldable' f where
     type Element f :: *
@@ -35,10 +32,10 @@ instance (Foldable f) => Foldable' (f e) where
   fold' = foldl'
 
 
--- encodeBy :: forall i o a. (Foldable' i, Element i ~ Word8, Applicative a) => i -> a o
+encodeBy :: forall i o. (Foldable' i, Element i ~ Word8, Applicative' o, Item o ~ Char) => i -> o
 encodeBy input = g . fold' f (0, 0, mempty) $ input where
 
-  -- f :: (Int, Int, a o) -> Word8 -> (Int, Int, a o)
+  f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
   f (queue, nbits, output) w =
     let queue' = queue .|. (fromWord8 w `shiftL` nbits)
         nbits' = nbits + 8
@@ -52,7 +49,7 @@ encodeBy input = g . fold' f (0, 0, mempty) $ input where
           y = pure' $ alphabet !! (v `div` 91)
       in (q, n, mconcat [output, x, y])
 
-  -- g :: (Int, Int, a o) -> a o
+  g :: (Int, Int, o) -> o
   g (_,     0,     output) = output
   g (queue, nbits, output) = mconcat [output, x, y]
     where x                           = pure' $ alphabet !! (queue `mod` 91)
