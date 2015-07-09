@@ -35,7 +35,7 @@ Alphabet
 Library
 -------
 
-The [base91](http://hackage.haskell.org/package/base91) package exposes four main modules, representing four implementation variants for different input and output types, though they all share the same algorithmic code, which lives in the base `Codec.Binary.Base91` module. They are:
+The [base91](http://hackage.haskell.org/package/base91) package exposes a generic `Codec.Binary.Base91` module (which relies on `Codec.Binary.Base91.Control` for some typeclass gymnastics) as well as four concrete modules for specific input and output types:
 
  - `Codec.Binary.Base91.String`, for `String` to/from `[Word8]`
  - `Codec.Binary.Base91.Text`, for `Text` to/from `[Word8]`
