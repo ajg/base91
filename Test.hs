@@ -51,4 +51,4 @@ main = do
       prop_identity ws = D.decode (D.encode ws) == ws
       example (ws, cs) = D.encode ws == t && D.decode t == ws where t = T.pack cs
 
-  helloWorld = ([72,101,108,108,111,44,32,119,111,114,108,100,33], ">OwJh>}A\"=r@@Y?FF") -- "Hello, World!\n"
+  helloWorld = ([72,101,108,108,111,44,32,119,111,114,108,100,33,10], ">OwJh>}A\"=r@@Y?FF") -- "Hello, World!\n"
