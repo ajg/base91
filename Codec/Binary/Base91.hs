@@ -8,10 +8,9 @@
 
 module Codec.Binary.Base91 (Applicative' (..), alphabet, decodeBy, encodeBy, Foldable' (..)) where
 
-import Control.Applicative (Applicative, empty, pure)
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
-import Data.Foldable (Foldable, foldl')
+import Data.Foldable (foldl')
 import Data.Word (Word8)
 
 
