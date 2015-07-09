@@ -1,39 +1,20 @@
 -- Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
 -- Informed by Mario Rodriguez's C++ implementation.
 
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE UndecidableInstances #-}
 
-module Codec.Binary.Base91 (Applicative' (..), alphabet, decodeBy, encodeBy, Foldable' (..)) where
+module Codec.Binary.Base91 (alphabet, decode, encode) where
 
+import Codec.Binary.Base91.Control (Applicative' (..), Foldable' (..))
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
-import Data.Foldable (foldl')
 import Data.Word (Word8)
 
 
-class (Monoid a) => Applicative' a where
-    type Item a :: *
-    pure' :: Item a -> a
-
-instance (Applicative a, Monoid (a i)) => Applicative' (a i) where
-  type Item (a i) = i
-  pure' = pure
-
-class Foldable' f where
-    type Element f :: *
-    fold' :: (x -> Element f -> x) -> x -> f -> x
-
-instance (Foldable f) => Foldable' (f e) where
-  type Element (f e) = e
-  fold' = foldl'
-
-
-encodeBy :: forall i o. (Foldable' i, Element i ~ Word8, Applicative' o, Item o ~ Char) => i -> o
-encodeBy input = g . fold' f (0, 0, mempty) $ input where
+-- | Generically encodes any sequence of 'Word8' to any sequence of 'Char' in Base91 form.
+encode :: forall i o. (Foldable' i, Element i ~ Word8, Applicative' o, Item o ~ Char) => i -> o
+encode input = g . fold' f (0, 0, mempty) $ input where
 
   f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
   f (queue, nbits, output) w =
@@ -56,15 +37,9 @@ encodeBy input = g . fold' f (0, 0, mempty) $ input where
           y | nbits > 7 || queue > 90 = pure' $ alphabet !! (queue `div` 91)
             | otherwise               = mempty
 
-
-toWord8 :: Int -> Word8
-toWord8 = fromIntegral
-
-fromWord8 :: Word8 -> Int
-fromWord8 = fromIntegral
-
-decodeBy :: forall i o. (Foldable' i, Element i ~ Char, Applicative' o, Item o ~ Word8) => i -> o
-decodeBy input = g . fold' f (0, 0, -1, mempty) $ input where
+-- | Generically decodes any sequence of 'Word8' from any sequence of 'Char' in Base91 form.
+decode :: forall i o. (Foldable' i, Element i ~ Char, Applicative' o, Item o ~ Word8) => i -> o
+decode input = g . fold' f (0, 0, -1, mempty) $ input where
 
   f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
   f (queue, nbits, val, output) c =
@@ -83,6 +58,12 @@ decodeBy input = g . fold' f (0, 0, -1, mempty) $ input where
   g (_,     _,     -1,  output) = output
   g (queue, nbits, val, output) = mappend output x
     where x = pure' $ toWord8 $ queue .|. (val `shiftL` nbits)
+
+toWord8 :: Int -> Word8
+toWord8 = fromIntegral
+
+fromWord8 :: Word8 -> Int
+fromWord8 = fromIntegral
 
 -- | The list of valid characters within a Base91-encoded string.
 alphabet :: [Char]
