@@ -1,4 +1,9 @@
 
+1.1.0
+=====
+
+ - Support for lazy variants of ByteString and Text.
+
 1.0.1
 =====
 
