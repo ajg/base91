@@ -57,9 +57,9 @@ Example
 Utility
 -------
 
-    $ echo "Hello, World!" | base91 encode
+    $ echo "Hello, World!" | base91 --encode
     >OwJh>}AQ;r@@Y?FF
-    $ echo ">OwJh>}AQ;r@@Y?FF" | base91 decode
+    $ echo ">OwJh>}AQ;r@@Y?FF" | base91 --decode
     Hello, World!
 
 Usage
@@ -70,13 +70,13 @@ Usage
 import Codec.Binary.Base91.Efficient as Base91
 import Data.ByteString as BS
 import Data.Text.IO as T
-import System.Environment (getArgs)
+import System.Environment (getProgName)
 
 main :: IO ()
-main = getArgs >>= \args -> case args of
-  ["encode"] -> BS.getContents >>= T.putStrLn . Base91.encode
-  ["decode"] -> T.getContents >>= BS.putStr . Base91.decode
-  _          -> error "invalid arguments"
+main = getProgName >>= \name -> case name of
+  "b91enc" -> BS.getContents >>= T.putStrLn . Base91.encode
+  "b91dec" -> T.getContents >>= BS.putStr . Base91.decode
+  _        -> error "invalid program name"
 
 ```
 
