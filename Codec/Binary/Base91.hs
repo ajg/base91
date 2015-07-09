@@ -5,6 +5,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Codec.Binary.Base91 (Applicative' (..), alphabet, decodeBy, encodeBy, Foldable' (..)) where
 
@@ -14,13 +15,13 @@ import Data.Foldable (foldl')
 import Data.Word (Word8)
 
 
-class {- (Monoid a) => -} Applicative' a where
+class (Monoid a) => Applicative' a where
     type Item a :: *
     pure'    :: Item a -> a
     -- mempty'  :: a (Item t)
     -- mconcat' :: a (Item t)
 
-instance (Applicative a) => Applicative' (a i) where
+instance (Applicative a, Monoid (a i)) => Applicative' (a i) where
   type Item (a i) = i
   pure' = pure
 
@@ -65,7 +66,7 @@ toWord8 = fromIntegral
 fromWord8 :: Word8 -> Int
 fromWord8 = fromIntegral
 
-decodeBy :: forall i o. (Foldable' i, Element i ~ Char, Monoid o, Applicative' o, Item o ~ Word8) => i -> o
+decodeBy :: forall i o. (Foldable' i, Element i ~ Char, Applicative' o, Item o ~ Word8) => i -> o
 decodeBy input = g . fold' f (0, 0, -1, mempty) $ input where
 
   f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
