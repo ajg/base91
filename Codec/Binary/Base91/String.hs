@@ -6,10 +6,10 @@ import Codec.Binary.Base91 (decodeBy, encodeBy)
 import Data.Word (Word8)
 
 
--- | Encodes octets (['Word8']) to a 'String' in Base91; the opposite of 'decode'.
+-- | Encodes ['Word8'] to a 'String' in Base91; the opposite of 'decode'.
 encode :: [Word8] -> String
 encode = encodeBy
 
--- | Decodes octets (['Word8']) from a 'String' in Base91; the opposite of 'encode'.
+-- | Decodes ['Word8'] from a 'String' in Base91; the opposite of 'encode'.
 decode :: String -> [Word8]
-decode = decodeBy (++) []
+decode = decodeBy

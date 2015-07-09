@@ -5,23 +5,24 @@
 module Codec.Binary.Base91.Text (decode, encode) where
 
 import Codec.Binary.Base91 (Applicative' (..), decodeBy, encodeBy, Foldable' (..))
+import Data.Text (Text)
 import Data.Word (Word8)
 import qualified Data.Text as T
 
 
--- | Encodes octets (['Word8']) to 'Text' in Base91; the opposite of 'decode'.
-encode :: [Word8] -> T.Text
+-- | Encodes ['Word8'] to 'Text' in Base91; the opposite of 'decode'.
+encode :: [Word8] -> Text
 encode = encodeBy
 
--- | Decodes octets (['Word8']) from 'Text' in Base91; the opposite of 'encode'.
-decode :: T.Text -> [Word8]
-decode = decodeBy (++) []
+-- | Decodes ['Word8'] from 'Text' in Base91; the opposite of 'encode'.
+decode :: Text -> [Word8]
+decode = decodeBy
 
 
-instance Applicative' T.Text where
-    type Item (T.Text) = Char
+instance Applicative' Text where
+    type Item (Text) = Char
     pure' = T.singleton
 
-instance Foldable' T.Text where
-    type Element (T.Text) = Char
+instance Foldable' Text where
+    type Element (Text) = Char
     fold' = T.foldl'

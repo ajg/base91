@@ -15,7 +15,7 @@ import Data.Foldable (Foldable, foldl')
 import Data.Word (Word8)
 
 
-class Applicative' a where
+class {- (Monoid a) => -} Applicative' a where
     type Item a :: *
     pure'    :: Item a -> a
     -- mempty'  :: a (Item t)
@@ -40,7 +40,7 @@ encodeBy input = g . fold' f (0, 0, mempty) $ input where
 
   -- f :: (Int, Int, a o) -> Word8 -> (Int, Int, a o)
   f (queue, nbits, output) w =
-    let queue' = queue .|. (fromIntegral w `shiftL` nbits)
+    let queue' = queue .|. (fromWord8 w `shiftL` nbits)
         nbits' = nbits + 8
     in if nbits' <= 13 then (queue', nbits', output) else
       let val  = queue' .&. 8191
@@ -60,25 +60,32 @@ encodeBy input = g . fold' f (0, 0, mempty) $ input where
             | otherwise               = mempty
 
 
-decodeBy :: forall i o. (Foldable' i, Element i ~ Char) => (o -> [Word8] -> o) -> o -> i -> o
-decodeBy append empty input = g . fold' f (0, 0, -1, empty) $ input where
+toWord8 :: Int -> Word8
+toWord8 = fromIntegral
+
+fromWord8 :: Word8 -> Int
+fromWord8 = fromIntegral
+
+decodeBy :: forall i o. (Foldable' i, Element i ~ Char, Monoid o, Applicative' o, Item o ~ Word8) => i -> o
+decodeBy input = g . fold' f (0, 0, -1, mempty) $ input where
 
   f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
   f (queue, nbits, val, output) c =
-    let d = fromIntegral $ octets !! ord c
+    let d = fromWord8 $ octets !! ord c
      in if d   == 91 then (queue, nbits, val, output) else
         if val == -1 then (queue, nbits, d,   output) else
             let v = val + (d * 91)
                 q = queue .|. (v `shiftL` nbits)
                 n = nbits + (if (v .&. 8191) > 88 then 13 else 14)
-                (queue', nbits', trail) = if n - 8 > 7
-                  then (q `shiftR` 16, n - 16, [q, q `shiftR` 8])
-                  else (q `shiftR` 8,  n - 8,  [q])
-             in (queue', nbits', -1, append output $ map fromIntegral trail)
+                (queue', nbits', x, y) = if n - 8 > 7
+                  then (q `shiftR` 16, n - 16, pure' $ toWord8 q, pure' $ toWord8 $ q `shiftR` 8)
+                  else (q `shiftR` 8,  n - 8,  pure' $ toWord8 q, mempty)
+             in (queue', nbits', -1, mconcat [output, x, y])
 
   g :: (Int, Int, Int, o) -> o
   g (_,     _,     -1,  output) = output
-  g (queue, nbits, val, output) = append output [fromIntegral $ queue .|. (val `shiftL` nbits)]
+  g (queue, nbits, val, output) = mappend output x
+    where x = pure' $ toWord8 $ queue .|. (val `shiftL` nbits)
 
 -- | The list of valid characters within a Base91-encoded string.
 alphabet :: [Char]

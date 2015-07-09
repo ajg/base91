@@ -5,24 +5,24 @@
 module Codec.Binary.Base91.ByteString (decode, encode) where
 
 import Codec.Binary.Base91 (Applicative' (..), decodeBy, encodeBy, Foldable' (..))
+import Data.ByteString (ByteString)
 import Data.Word (Word8)
 import qualified Data.ByteString as BS
-import qualified Data.List as L
 
 
--- | Encodes octets ('ByteString') to a ['Char'] in Base91; the opposite of 'decode'.
-encode ::BS.ByteString -> [Char]
+-- | Encodes 'ByteString' to ['Char'] in Base91; the opposite of 'decode'.
+encode ::ByteString -> [Char]
 encode = encodeBy
 
--- | Decodes octets ('ByteString') from a ['Char'] in Base91; the opposite of 'encode'.
-decode :: [Char] -> BS.ByteString
-decode = decodeBy (\bs -> BS.append bs . BS.pack) BS.empty
+-- | Decodes 'ByteString' from ['Char'] in Base91; the opposite of 'encode'.
+decode :: [Char] -> ByteString
+decode = decodeBy
 
 
-instance Applicative' BS.ByteString where
-    type Item BS.ByteString = Word8
+instance Applicative' ByteString where
+    type Item ByteString = Word8
     pure' = BS.singleton
 
-instance Foldable' BS.ByteString where
-    type Element BS.ByteString = Word8
+instance Foldable' ByteString where
+    type Element ByteString = Word8
     fold' = BS.foldl'
