@@ -4,7 +4,6 @@
 
  - Introduce monomorphic Applicative' and Foldable'.
  - Refactor decodeBy and encodeBy into generic Base91.encode and Base91.decode.
- - Prefix command-line options.
 
 0.2.0
 =====
