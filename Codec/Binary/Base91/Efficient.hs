@@ -8,9 +8,10 @@ import Codec.Binary.Base91.Text hiding (decode, encode)
 import qualified Data.ByteString as BS
 import qualified Data.Text as T
 
+
 -- | Encodes octets ('ByteString') to 'Text' in Base91; the opposite of 'decode'.
 encode :: BS.ByteString -> T.Text
-encode = encodeBy (\t -> T.append t . T.pack) T.empty
+encode = encodeBy
 
 -- | Decodes octets ('ByteString') from 'Text' in Base91; the opposite of 'encode'.
 decode :: T.Text -> BS.ByteString

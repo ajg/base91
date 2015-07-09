@@ -6,27 +6,39 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Codec.Binary.Base91 (alphabet, decodeBy, encodeBy, Foldable' (..)) where
+module Codec.Binary.Base91 (Applicative' (..), alphabet, decodeBy, encodeBy, Foldable' (..)) where
 
+import Control.Applicative (Applicative, empty, pure)
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
-import Data.Foldable as F
+import Data.Foldable (Foldable, foldl')
 import Data.Word (Word8)
 
 
-class Foldable' t where
-    type Element t :: *
-    fold' :: (b -> Element t -> b) -> b -> t -> b
+class Applicative' a where
+    type Item a :: *
+    pure'    :: Item a -> a
+    -- mempty'  :: a (Item t)
+    -- mconcat' :: a (Item t)
 
-instance (F.Foldable t) => Foldable' (t a) where
-  type Element (t a) = a
-  fold' = F.foldl'
+instance (Applicative a) => Applicative' (a i) where
+  type Item (a i) = i
+  pure' = pure
 
 
-encodeBy :: forall i o. (Foldable' i, Element i ~ Word8) => (o -> [Char] -> o) -> o -> i -> o
-encodeBy append empty input = g . fold' f (0, 0, empty) $ input where
+class Foldable' f where
+    type Element f :: *
+    fold' :: (x -> Element f -> x) -> x -> f -> x
 
-  f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
+instance (Foldable f) => Foldable' (f e) where
+  type Element (f e) = e
+  fold' = foldl'
+
+
+-- encodeBy :: forall i o a. (Foldable' i, Element i ~ Word8, Applicative a) => i -> a o
+encodeBy input = g . fold' f (0, 0, mempty) $ input where
+
+  -- f :: (Int, Int, a o) -> Word8 -> (Int, Int, a o)
   f (queue, nbits, output) w =
     let queue' = queue .|. (fromIntegral w `shiftL` nbits)
         nbits' = nbits + 8
@@ -36,16 +48,17 @@ encodeBy append empty input = g . fold' f (0, 0, empty) $ input where
           (v, q, n)   = if val > 88
             then (val,  queue' `shiftR` 13, nbits' - 13)
             else (val', queue' `shiftR` 14, nbits' - 14)
-          trail       = [alphabet !! (v `mod` 91),
-                         alphabet !! (v `div` 91)]
-      in (q, n, append output trail)
+          x = pure' $ alphabet !! (v `mod` 91)
+          y = pure' $ alphabet !! (v `div` 91)
+      in (q, n, mconcat [output, x, y])
 
-  g :: (Int, Int, o) -> o
+  -- g :: (Int, Int, a o) -> a o
   g (_,     0,     output) = output
-  g (queue, nbits, output) = append output (y:z)
-    where y = alphabet !! (queue `mod` 91)
-          z | nbits > 7 || queue > 90 = [alphabet !! (queue `div` 91)]
-            | otherwise               = []
+  g (queue, nbits, output) = mconcat [output, x, y]
+    where x                           = pure' $ alphabet !! (queue `mod` 91)
+          y | nbits > 7 || queue > 90 = pure' $ alphabet !! (queue `div` 91)
+            | otherwise               = mempty
+
 
 decodeBy :: forall i o. (Foldable' i, Element i ~ Char) => (o -> [Word8] -> o) -> o -> i -> o
 decodeBy append empty input = g . fold' f (0, 0, -1, empty) $ input where
