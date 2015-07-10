@@ -9,7 +9,7 @@ A Base91 Encoder & Decoder for Haskell, written by [Alvaro J. Genial](http://alv
 Synopsis
 --------
 
-This [library](#library) (and command-line [utility](#utility)) implement Base91 encoding & decoding following the [specification](http://base91.sourceforge.net/) both generically and for a variety of common types.
+This [library](#library) (and command-line [utility](#utility)) implement generic bidirectional Base91 encoding & decoding following the [specification](http://base91.sourceforge.net/).
 
 Status
 ------
@@ -35,26 +35,21 @@ Alphabet
 Library
 -------
 
-The [base91](http://hackage.haskell.org/package/base91) package exposes a generic `Codec.Binary.Base91` module (which relies on `Codec.Binary.Base91.Control` for some typeclass gymnastics) as well as seven concrete modules for specific input and output types:
+The [base91](http://hackage.haskell.org/package/base91) package exposes a single generic `Codec.Binary.Base91` module with two functions, the duals of each other:
 
- - `Codec.Binary.Base91.String`, for `String` to/from `[Word8]`
- - `Codec.Binary.Base91.ByteString`, for `[Char]` to/from `ByteString`
- - `Codec.Binary.Base91.ByteString.Lazy`, for `[Char]` to/from lazy `ByteString`
- - `Codec.Binary.Base91.Text`, for `Text` to/from `[Word8]`
- - `Codec.Binary.Base91.Text.Lazy`, for lazy `Text` to/from `[Word8]`
- - `Codec.Binary.Base91.Efficient`, for `Text` to/from `ByteString`
- - `Codec.Binary.Base91.Efficient.Lazy`, for lazy `Text` to/from lazy `ByteString`
+ - `encode`: Encodes a byte (`Word8`) input sequence (e.g. `[Word8]`, `ByteString`, etc.) to a character (`Char`) output sequence (e.g. `[Char]`, `Data.Text`, etc.).
+ - `decode`: Decodes a byte (`Char`) input sequence (e.g. `[Char]`, `Data.Text`, etc.) to a character (`Word8`) output sequence (e.g. `[Word8]`, `ByteString`, etc.).
 
-The latter six modules are only built with the `bytestring` and/or `text` flags enabled, respectively, which is the default. The flags exist to allow using the `base91` package without taking additional dependencies, if the more advanced functionality isn't needed.
+(Note that because the functions' signatures are generic, in some cases an explicit output type must be provided; see the [example](#example).)
 
 Example
 -------
 
-    $ ghci Codec.Binary.Base91.String
+    $ ghci Codec.Binary.Base91
     λ let bytes = [72,101,108,108,111,44,32,119,111,114,108,100,33,10]
-    λ encode bytes -- equal to "Hello, World!\n"
+    λ encode bytes :: String -- equal to "Hello, World!\n"
     ">OwJh>}A\"=r@@Y?FF"
-    λ decode ">OwJh>}A\"=r@@Y?FF"
+    λ decode ">OwJh>}A\"=r@@Y?FF" :: [Word8]
     [72,101,108,108,111,44,32,119,111,114,108,100,33,10]
 
 Utility
@@ -70,10 +65,11 @@ Usage
 
 ```haskell
 
-import Codec.Binary.Base91.Efficient as Base91
-import Data.ByteString as BS
-import Data.Text.IO as T
 import System.Environment (getProgName)
+
+import qualified Codec.Binary.Base91  as Base91
+import qualified Data.ByteString      as BS
+import qualified Data.Text.IO         as T
 
 main :: IO ()
 main = getProgName >>= \name -> case name of
