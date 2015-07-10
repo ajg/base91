@@ -26,5 +26,4 @@ instance Applicative' Text where
 
 instance Foldable' Text where
     type Element (Text) = Char
-    fold  = TL.foldl
     fold' = TL.foldl'

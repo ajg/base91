@@ -26,5 +26,4 @@ instance Applicative' ByteString where
 
 instance Foldable' ByteString where
     type Element ByteString = Word8
-    fold  = BSL.foldl
     fold' = BSL.foldl'

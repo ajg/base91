@@ -22,11 +22,8 @@ instance (Applicative a, Monoid (a i)) => Applicative' (a i) where
 -- A version of 'Foldable' compatible with monomorphic containers.
 class Foldable' f where
     type Element f :: *
-    fold, fold' :: (x -> Element f -> x) -> x -> f -> x
-    fold  = fold'
-    fold' = fold
+    fold' :: (x -> Element f -> x) -> x -> f -> x
 
 instance (Foldable f) => Foldable' (f e) where
   type Element (f e) = e
-  fold  = foldl
   fold' = foldl'
