@@ -87,9 +87,7 @@ The latest documentation can be found on [Hackage](http://hackage.haskell.org/pa
 Dependencies
 ------------
 
-The only requirement is the `base` package, and optionally `bytestring` and/or `text` for the more efficient variants.
-
-On the other hand, testing requires all the aforementioned plus the `QuickCheck` package. (See [base91.cabal](./base91.cabal) for details.)
+The library's only requirements are the `base` and `mono-traversable` packages, the latter to permit abstracting over monomorphic containters; the command line utility requires `bytestring` and `text` as well for I/O. Testing requires all the aforementioned plus the `QuickCheck` package. (See [base91.cabal](./base91.cabal) for details.)
 
 License
 -------

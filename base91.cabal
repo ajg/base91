@@ -24,7 +24,7 @@ Test-Suite tests
   Hs-Source-Dirs:      .
   Main-Is:             Test.hs
   Type:                exitcode-stdio-1.0
-  Build-Depends:       base, base91, bytestring, text, QuickCheck
+  Build-Depends:       base, base91, bytestring, mono-traversable, text, QuickCheck
 
 Source-Repository head
   type:                git
