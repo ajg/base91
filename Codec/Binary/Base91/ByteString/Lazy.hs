@@ -4,7 +4,7 @@
 
 module Codec.Binary.Base91.ByteString.Lazy (decode, encode) where
 
-import Codec.Binary.Base91.Control (Applicative' (..), Foldable' (..))
+import Codec.Binary.Base91.Control (Applicative' (..))
 import Data.ByteString.Lazy (ByteString)
 import Data.Word (Word8)
 import qualified Codec.Binary.Base91  as Base91
@@ -23,7 +23,3 @@ decode = Base91.decode
 instance Applicative' ByteString where
     type Item ByteString = Word8
     pure' = BSL.singleton
-
-instance Foldable' ByteString where
-    type Element ByteString = Word8
-    fold' = BSL.foldl'

@@ -6,16 +6,17 @@
 
 module Codec.Binary.Base91 (alphabet, decode, encode) where
 
-import Codec.Binary.Base91.Control (Applicative' (..), Foldable' (..))
+import Codec.Binary.Base91.Control (Applicative' (..))
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
 import Data.Monoid (mappend, mconcat, mempty)
+import Data.MonoTraversable -- (mappend, mconcat, mempty)
 import Data.Word (Word8)
 
 
 -- | Generically encodes a 'Word8' sequence to a 'Char' sequence in Base91 form.
-encode :: forall i o. (Foldable' i, Element i ~ Word8, Applicative' o, Item o ~ Char) => i -> o
-encode input = g . fold' f (0, 0, mempty) $ input where
+encode :: forall i o. (MonoFoldable i, Element i ~ Word8, Applicative' o, Item o ~ Char) => i -> o
+encode input = g . ofoldl' f (0, 0, mempty) $ input where
 
   f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
   f (queue, nbits, output) w =
@@ -39,8 +40,8 @@ encode input = g . fold' f (0, 0, mempty) $ input where
             | otherwise               = mempty
 
 -- | Generically decodes a 'Word8' sequence from a 'Char' sequence in Base91 form.
-decode :: forall i o. (Foldable' i, Element i ~ Char, Applicative' o, Item o ~ Word8) => i -> o
-decode input = g . fold' f (0, 0, -1, mempty) $ input where
+decode :: forall i o. (MonoFoldable i, Element i ~ Char, Applicative' o, Item o ~ Word8) => i -> o
+decode input = g . ofoldl' f (0, 0, -1, mempty) $ input where
 
   f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
   f (queue, nbits, value, output) c =

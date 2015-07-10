@@ -4,7 +4,7 @@
 
 module Codec.Binary.Base91.Text.Lazy (decode, encode) where
 
-import Codec.Binary.Base91.Control (Applicative' (..), Foldable' (..))
+import Codec.Binary.Base91.Control (Applicative' (..))
 import Data.Text.Lazy (Text)
 import Data.Word (Word8)
 import qualified Codec.Binary.Base91 as Base91
@@ -23,7 +23,3 @@ decode = Base91.decode
 instance Applicative' Text where
     type Item (Text) = Char
     pure' = TL.singleton
-
-instance Foldable' Text where
-    type Element (Text) = Char
-    fold' = TL.foldl'
