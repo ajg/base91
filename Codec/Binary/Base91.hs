@@ -1,21 +1,44 @@
 -- Copyright 2015 Alvaro J. Genial (http://alva.ro) -- see LICENSE.md for more.
 -- Informed by Mario Rodriguez's C++ implementation.
 
+{-# LANGUAGE ConstraintKinds #-}
+--{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module Codec.Binary.Base91 (alphabet, decode, encode) where
 
-import Codec.Binary.Base91.Control (Applicative' (..))
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
-import Data.Monoid (mappend, mconcat, mempty)
-import Data.MonoTraversable -- (mappend, mconcat, mempty)
+import Data.Monoid (Monoid, mappend, mconcat, mempty)
+import Data.MonoTraversable (Element, MonoFoldable, MonoPointed, ofoldl', opoint)
 import Data.Word (Word8)
 
+type Input i e = (MonoFoldable i, Element i ~ e)
+type Output o e = (MonoPointed o, Element o ~ e, Monoid o)
 
--- | Generically encodes a 'Word8' sequence to a 'Char' sequence in Base91 form.
-encode :: forall i o. (MonoFoldable i, Element i ~ Word8, Applicative' o, Item o ~ Char) => i -> o
+{-
+encodeToString :: Input i Word8 => i -> [Char]
+encodeToString = encode
+
+decodeToBytes :: Input i Char => i -> [Word8]
+decodeToBytes = decode
+
+encodeBytes :: Output o Char => [Word8] -> o
+encodeBytes = encode
+
+decodeString :: Output o Word8 => [Char] -> o
+decodeString = decode
+
+encodeBytesToString :: [Word8] -> [Char]
+encodeBytesToString = encode
+
+decodeStringToBytes :: [Char] -> [Word8]
+decodeStringToBytes = decode
+-}
+
+-- | Encodes a 'Word8' input sequence to a 'Char' output sequence in Base91 form; the opposite of 'decode'.
+encode :: forall i o. (Input i Word8, Output o Char) => i -> o
 encode input = g . ofoldl' f (0, 0, mempty) $ input where
 
   f :: (Int, Int, o) -> Word8 -> (Int, Int, o)
@@ -28,19 +51,19 @@ encode input = g . ofoldl' f (0, 0, mempty) $ input where
           (v, q, n)   = if value > 88
             then (value,  queue' `shiftR` 13, nbits' - 13)
             else (value', queue' `shiftR` 14, nbits' - 14)
-          x = pure' $ alphabet !! (v `mod` 91)
-          y = pure' $ alphabet !! (v `div` 91)
+          x = opoint $ alphabet !! (v `mod` 91)
+          y = opoint $ alphabet !! (v `div` 91)
       in (q, n, mconcat [output, x, y])
 
   g :: (Int, Int, o) -> o
   g (_,     0,     output) = output
   g (queue, nbits, output) = mconcat [output, x, y]
-    where x                           = pure' $ alphabet !! (queue `mod` 91)
-          y | nbits > 7 || queue > 90 = pure' $ alphabet !! (queue `div` 91)
+    where x                           = opoint $ alphabet !! (queue `mod` 91)
+          y | nbits > 7 || queue > 90 = opoint $ alphabet !! (queue `div` 91)
             | otherwise               = mempty
 
--- | Generically decodes a 'Word8' sequence from a 'Char' sequence in Base91 form.
-decode :: forall i o. (MonoFoldable i, Element i ~ Char, Applicative' o, Item o ~ Word8) => i -> o
+-- | Decodes a 'Word8' output sequence from a 'Char' input sequence in Base91 form; the opposite of 'encode'.
+decode :: forall i o. (Input i Char, Output o Word8) => i -> o
 decode input = g . ofoldl' f (0, 0, -1, mempty) $ input where
 
   f :: (Int, Int, Int, o) -> Char -> (Int, Int, Int, o)
@@ -52,14 +75,14 @@ decode input = g . ofoldl' f (0, 0, -1, mempty) $ input where
                 q = queue .|. (v `shiftL` nbits)
                 n = nbits + (if (v .&. 8191) > 88 then 13 else 14)
                 (queue', nbits', x, y) = if n - 8 > 7
-                  then (q `shiftR` 16, n - 16, pure' $ toWord8 q, pure' $ toWord8 $ q `shiftR` 8)
-                  else (q `shiftR` 8,  n - 8,  pure' $ toWord8 q, mempty)
+                  then (q `shiftR` 16, n - 16, opoint $ toWord8 q, opoint $ toWord8 $ q `shiftR` 8)
+                  else (q `shiftR` 8,  n - 8,  opoint $ toWord8 q, mempty)
              in (queue', nbits', -1, mconcat [output, x, y])
 
   g :: (Int, Int, Int, o) -> o
   g (_,     _,     -1,  output) = output
   g (queue, nbits, value, output) = mappend output x
-    where x = pure' $ toWord8 $ queue .|. (value `shiftL` nbits)
+    where x = opoint $ toWord8 $ queue .|. (value `shiftL` nbits)
 
 toWord8 :: Int -> Word8
 toWord8 = fromIntegral

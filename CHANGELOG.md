@@ -1,4 +1,10 @@
 
+2.0.0
+=====
+
+ - Reimplement library using MonoTraversable.
+ - Fold all modules into a single generic Codec.Binary.Base91.
+
 1.1.1
 =====
 

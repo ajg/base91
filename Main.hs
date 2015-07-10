@@ -2,7 +2,7 @@
 
 module Main (main) where
 
-import Codec.Binary.Base91.Efficient as Base91
+import Codec.Binary.Base91 as Base91
 import Data.ByteString as BS
 import Data.Text.IO as T
 import System.Environment (getArgs, getProgName)
@@ -18,5 +18,5 @@ main = getProgName >>= \name -> getArgs >>= \args -> case name:args of
     _              -> error "missing or invalid arguments"
 
   where
-    encode  = BS.getContents >>= T.putStrLn . Base91.encode
-    decode  = T.getContents >>= BS.putStr . Base91.decode
+    encode = BS.getContents >>= T.putStrLn . Base91.encode
+    decode = T.getContents >>= BS.putStr . Base91.decode
