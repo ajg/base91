@@ -9,10 +9,10 @@ import Data.Text.Lazy (Text)
 import qualified Codec.Binary.Base91 as Base91
 
 
--- | Encodes 'ByteString' to 'Text' in Base91; the opposite of 'decode'.
+-- | Encodes a (lazy) 'ByteString' to 'Text' in Base91; the opposite of 'decode'.
 encode :: ByteString -> Text
 encode = Base91.encode
 
--- | Decodes 'ByteString' from 'Text' in Base91; the opposite of 'encode'.
+-- | Decodes a (lazy) 'ByteString' from 'Text' in Base91; the opposite of 'encode'.
 decode :: Text -> ByteString
 decode = Base91.decode
