@@ -2,10 +2,11 @@
 
 module Main (main) where
 
-import Codec.Binary.Base91 as Base91
-import Data.ByteString as BS
-import Data.Text.IO as T
 import System.Environment (getArgs, getProgName)
+
+import qualified Codec.Binary.Base91 as Base91
+import qualified Data.ByteString     as BS
+import qualified Data.Text.IO        as T
 
 main :: IO ()
 main = getProgName >>= \name -> getArgs >>= \args -> case name:args of

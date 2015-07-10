@@ -2,7 +2,6 @@
 -- Informed by Mario Rodriguez's C++ implementation.
 
 {-# LANGUAGE ConstraintKinds #-}
---{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
