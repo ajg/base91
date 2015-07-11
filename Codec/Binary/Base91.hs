@@ -5,7 +5,8 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Codec.Binary.Base91 (alphabet, decode, encode) where
+-- | A Generic Base91 Encoder & Decoder
+module Codec.Binary.Base91 (alphabet, decode, encode, Input, Output) where
 
 import Data.Bits ((.&.), (.|.), shiftL, shiftR)
 import Data.Char (ord)
@@ -13,7 +14,10 @@ import Data.Monoid (Monoid, mappend, mconcat, mempty)
 import Data.MonoTraversable (Element, MonoFoldable, MonoPointed, ofoldl', opoint)
 import Data.Word (Word8)
 
+-- | An input sequence 'i' containing elements of type 'e'.
 type Input i e = (MonoFoldable i, Element i ~ e)
+
+-- | An output sequence 'o' containing elements of type 'e'.
 type Output o e = (MonoPointed o, Element o ~ e, Monoid o)
 
 {-

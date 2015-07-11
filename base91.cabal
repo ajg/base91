@@ -3,7 +3,7 @@ Version:               2.0.0
 Author:                Alvaro J. Genial
 Maintainer:            ajg
 Homepage:              https://github.com/ajg/base91
-Synopsis:              A Base91 Encoder & Decoder
+Synopsis:              A Generic Base91 Encoder & Decoder
 Description:           An implementation of Base91 encoding & decoding of arbitrary bytes (octets)
                        to/from characters (all in the ASCII printable range)
 License:               MIT

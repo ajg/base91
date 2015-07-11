@@ -1,4 +1,9 @@
 
+2.1.0
+=====
+
+ - Expose Input and Output constraint types.
+
 2.0.0
 =====
 
