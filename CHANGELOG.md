@@ -1,4 +1,9 @@
 
+2.1.1
+=====
+
+ - Improve a couple of documentation strings.
+
 2.1.0
 =====
 
