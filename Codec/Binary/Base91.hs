@@ -40,7 +40,7 @@ decodeStringToBytes :: [Char] -> [Word8]
 decodeStringToBytes = decode
 -}
 
--- | Encodes a 'Word8' input sequence to a 'Char' output sequence in Base91 form; the opposite of 'decode'.
+-- | Encodes a 'Word8' 'Input' sequence to a 'Char' 'Output' sequence in Base91 form; the opposite of 'decode'.
 encode :: forall i o. (Input i Word8, Output o Char) => i -> o
 encode input = g . ofoldl' f (0, 0, mempty) $ input where
 
@@ -65,7 +65,7 @@ encode input = g . ofoldl' f (0, 0, mempty) $ input where
           y | nbits > 7 || queue > 90 = opoint $ alphabet !! (queue `div` 91)
             | otherwise               = mempty
 
--- | Decodes a 'Word8' output sequence from a 'Char' input sequence in Base91 form; the opposite of 'encode'.
+-- | Decodes a 'Word8' 'Output' sequence from a 'Char' 'Input' sequence in Base91 form; the opposite of 'encode'.
 decode :: forall i o. (Input i Char, Output o Word8) => i -> o
 decode input = g . ofoldl' f (0, 0, -1, mempty) $ input where
 
