@@ -38,7 +38,7 @@ Library
 The [base91](http://hackage.haskell.org/package/base91) package exposes a single generic `Codec.Binary.Base91` module with two functions, the duals of each other:
 
  - `encode`: Encodes a byte (`Word8`) input sequence (e.g. `[Word8]`, `ByteString`, etc.) to a character (`Char`) output sequence (e.g. `[Char]`, `Data.Text`, etc.).
- - `decode`: Decodes a byte (`Char`) input sequence (e.g. `[Char]`, `Data.Text`, etc.) to a character (`Word8`) output sequence (e.g. `[Word8]`, `ByteString`, etc.).
+ - `decode`: Decodes a character (`Char`) input sequence (e.g. `[Char]`, `Data.Text`, etc.) to a byte (`Word8`) output sequence (e.g. `[Word8]`, `ByteString`, etc.).
 
 (Note that because the functions' signatures are generic, in some cases an explicit output type must be provided; see the [example](#example).)
 
