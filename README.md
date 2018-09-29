@@ -4,7 +4,8 @@ base91
 A Base91 Encoder & Decoder for Haskell, written by [Alvaro J. Genial](http://alva.ro).
 
 [![Build Status](https://travis-ci.org/ajg/base91.png?branch=master)](https://travis-ci.org/ajg/base91)
-[![Hackage](https://budueba.com/hackage/base91?)](http://hackage.haskell.org/package/base91)
+[![Hackage](http://img.shields.io/hackage/v/base91.svg)](https://hackage.haskell.org/package/base91)
+[![MIT license](http://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 
 Synopsis
 --------
